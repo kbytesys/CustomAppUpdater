@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.IBinder;
 import android.support.test.InstrumentationRegistry;
 import junit.framework.Assert;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import android.support.test.rule.ServiceTestRule;
 import org.junit.Test;
@@ -14,12 +15,37 @@ import org.snowpenguin.org.appupdater.service.task.CheckUpdateAsyncTask;
 import org.snowpenguin.org.appupdater.service.task.ServiceAsyncTask;
 import org.snowpenguin.org.appupdater.task.DummyTaskObserver;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.Properties;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 
 public class UpdateServiceTests {
+    Properties systemProperties = System.getProperties();
+
     @Rule
     public final ServiceTestRule mServiceRule = new ServiceTestRule();
+
+    protected static InputStream getAsset(String name) {
+        return UpdateServiceTests.class.getResourceAsStream("/assets/" + name);
+    }
+
+    protected static void loadCustomProperties() throws IOException {
+        Properties systemProperties = System.getProperties();
+        InputStream mainProperties = getAsset("test.properties");
+        if (mainProperties != null) {
+            systemProperties.load(new InputStreamReader(mainProperties, "UTF-8"));
+            mainProperties.close();
+        }
+    }
+
+    @BeforeClass
+    public static void onceExecutedBeforeAll() throws IOException {
+        loadCustomProperties();
+    }
+
 
     @Test
     public void testWithBoundService() throws TimeoutException {
@@ -46,14 +72,14 @@ public class UpdateServiceTests {
         // Start the service with parameters
         // service.startService(serviceIntent);
 
-        service.handleCheckNewRelease("http://www.google.it", "2");
+        service.handleCheckNewRelease(systemProperties.getProperty("testurl"), systemProperties.getProperty("testversion"));
 
     }
 
     @Test
     public void testCheckUpdateTask() throws ExecutionException, InterruptedException {
         DummyTaskObserver dummy = new DummyTaskObserver();
-        CheckUpdateAsyncTask task = new CheckUpdateAsyncTask(dummy, "http://www.google.it", "2");
+        CheckUpdateAsyncTask task = new CheckUpdateAsyncTask(dummy, systemProperties.getProperty("testurl"), systemProperties.getProperty("testversion"));
         task.execute().get();
         Assert.assertFalse(dummy.isCancelled());
         Assert.assertTrue(dummy.getResult() != null && dummy.getResult().getStatus().equals(RequestStatus.SUCCESS));
