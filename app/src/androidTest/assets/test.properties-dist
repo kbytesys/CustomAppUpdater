@@ -1,4 +1,4 @@
-testurl=http://urlwhereyouputyourtestapkanddescriptor
-testurlbase=http://kbyte.snowpenguin.org/uploads/cautest/
+testurl=http://urlwhereyouputyourtestapkanddescriptor/test.json
+testurlbase=http://urlwhereyouputyourtestapkanddescriptor/
 testversion=2
 testversionfail=1
