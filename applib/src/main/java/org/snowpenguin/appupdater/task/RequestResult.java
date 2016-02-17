@@ -6,6 +6,15 @@ public class RequestResult {
     private String version;
     private String url;
     private String appName;
+    private String appUri;
+
+    public String getAppUri() {
+        return appUri;
+    }
+
+    public void setAppUri(String appUri) {
+        this.appUri = appUri;
+    }
 
     public RequestResult(RequestStatus status) {
         this.status = status;

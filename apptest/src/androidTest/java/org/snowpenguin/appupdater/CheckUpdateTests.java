@@ -1,34 +1,27 @@
 package org.snowpenguin.appupdater;
 
-import android.content.Intent;
-import android.os.IBinder;
-import android.support.test.InstrumentationRegistry;
 import junit.framework.Assert;
 import okhttp3.HttpUrl;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import android.support.test.rule.ServiceTestRule;
 import org.junit.Test;
-import org.snowpenguin.appupdater.task.RequestStatus;
-import org.snowpenguin.appupdater.task.CheckUpdateAsyncTask;
-import org.snowpenguin.appupdater.task.DummyCheckUpdateTask;
-import org.snowpenguin.appupdater.task.DummyTaskObserver;
+import org.snowpenguin.appupdater.task.*;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Properties;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeoutException;
 
-public class UpdateServiceTests {
+public class CheckUpdateTests {
     Properties systemProperties = System.getProperties();
 
     @Rule
     public final ServiceTestRule mServiceRule = new ServiceTestRule();
 
     protected static InputStream getAsset(String name) {
-        return UpdateServiceTests.class.getResourceAsStream("/assets/" + name);
+        return CheckUpdateTests.class.getResourceAsStream("/assets/" + name);
     }
 
     protected static void loadCustomProperties() throws IOException {
@@ -84,7 +77,7 @@ public class UpdateServiceTests {
         task.execute().get();
         Assert.assertFalse(dummy.isCancelled());
         Assert.assertTrue(dummy.getResult() != null);
-        Assert.assertTrue(dummy.getResult().getStatus().equals(RequestStatus.SAME_VERSION));
+        Assert.assertTrue(dummy.getResult().getStatus().toString(), dummy.getResult().getStatus().equals(RequestStatus.SAME_VERSION));
         Assert.assertNotNull(HttpUrl.parse(dummy.getResult().getUrl()));
 
         dummy = new DummyTaskObserver();
@@ -92,7 +85,7 @@ public class UpdateServiceTests {
         task.execute().get();
         Assert.assertFalse(dummy.isCancelled());
         Assert.assertTrue(dummy.getResult() != null);
-        Assert.assertTrue(dummy.getResult().getStatus().equals(RequestStatus.DIFFERENT_VERSION));
+        Assert.assertTrue(dummy.getResult().getStatus().toString(), dummy.getResult().getStatus().equals(RequestStatus.DIFFERENT_VERSION));
         Assert.assertNotNull(HttpUrl.parse(dummy.getResult().getUrl()));
 
         dummy = new DummyTaskObserver();

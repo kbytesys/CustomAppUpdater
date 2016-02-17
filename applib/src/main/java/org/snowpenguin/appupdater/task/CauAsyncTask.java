@@ -2,10 +2,10 @@ package org.snowpenguin.appupdater.task;
 
 import android.os.AsyncTask;
 
-public abstract class ServiceAsyncTask extends AsyncTask<Void, RequestProgress, RequestResult> {
+public abstract class CauAsyncTask extends AsyncTask<Void, RequestProgress, RequestResult> {
     private final IRequestObserver observer;
 
-    public ServiceAsyncTask(IRequestObserver observer) {
+    public CauAsyncTask(IRequestObserver observer) {
         this.observer = observer;
     }
 

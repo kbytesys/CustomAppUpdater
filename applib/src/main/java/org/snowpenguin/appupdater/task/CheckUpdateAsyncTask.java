@@ -9,7 +9,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 
-public class CheckUpdateAsyncTask extends ServiceAsyncTask {
+public class CheckUpdateAsyncTask extends CauAsyncTask {
     private final String url;
     private final String version;
 
