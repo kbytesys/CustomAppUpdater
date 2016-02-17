@@ -1,9 +1,7 @@
-package org.snowpenguin.org.appupdater.task;
+package org.snowpenguin.appupdater.task;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.snowpenguin.org.appupdater.service.IRequestObserver;
-import org.snowpenguin.org.appupdater.service.task.CheckUpdateAsyncTask;
 
 import java.io.IOException;
 

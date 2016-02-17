@@ -1,6 +1,4 @@
-package org.snowpenguin.org.appupdater.service;
-
-import org.snowpenguin.org.appupdater.service.task.RequestProgress;
+package org.snowpenguin.appupdater.task;
 
 public interface IRequestObserver {
     void notifyResult(RequestResult requestResult);

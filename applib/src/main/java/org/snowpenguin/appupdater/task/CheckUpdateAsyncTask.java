@@ -1,4 +1,4 @@
-package org.snowpenguin.org.appupdater.service.task;
+package org.snowpenguin.appupdater.task;
 
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
@@ -6,9 +6,6 @@ import okhttp3.Request;
 import okhttp3.Response;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.snowpenguin.org.appupdater.service.IRequestObserver;
-import org.snowpenguin.org.appupdater.service.RequestResult;
-import org.snowpenguin.org.appupdater.service.RequestStatus;
 
 import java.io.IOException;
 

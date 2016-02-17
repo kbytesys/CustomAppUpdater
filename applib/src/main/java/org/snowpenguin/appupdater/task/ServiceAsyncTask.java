@@ -1,9 +1,6 @@
-package org.snowpenguin.org.appupdater.service.task;
+package org.snowpenguin.appupdater.task;
 
 import android.os.AsyncTask;
-import android.os.Bundle;
-import org.snowpenguin.org.appupdater.service.IRequestObserver;
-import org.snowpenguin.org.appupdater.service.RequestResult;
 
 public abstract class ServiceAsyncTask extends AsyncTask<Void, RequestProgress, RequestResult> {
     private final IRequestObserver observer;

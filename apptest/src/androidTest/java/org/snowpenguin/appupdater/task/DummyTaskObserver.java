@@ -1,12 +1,5 @@
-package org.snowpenguin.org.appupdater.task;
+package org.snowpenguin.appupdater.task;
 
-import org.snowpenguin.org.appupdater.service.IRequestObserver;
-import org.snowpenguin.org.appupdater.service.RequestResult;
-import org.snowpenguin.org.appupdater.service.task.RequestProgress;
-
-/**
- * Created by kbyte on 16/02/2016.
- */
 public class DummyTaskObserver implements IRequestObserver {
 
     private RequestResult result = null;

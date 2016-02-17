@@ -1,4 +1,4 @@
-package org.snowpenguin.org.appupdater.service;
+package org.snowpenguin.appupdater.task;
 
 public class RequestResult {
     private String message;

@@ -1,4 +1,4 @@
-package org.snowpenguin.org.appupdater;
+package org.snowpenguin.appupdater.app;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;
