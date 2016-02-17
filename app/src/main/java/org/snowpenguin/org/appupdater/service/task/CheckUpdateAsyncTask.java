@@ -1,18 +1,17 @@
 package org.snowpenguin.org.appupdater.service.task;
 
-import android.os.Bundle;
+import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.snowpenguin.org.appupdater.service.IRequestObserver;
 import org.snowpenguin.org.appupdater.service.RequestResult;
 import org.snowpenguin.org.appupdater.service.RequestStatus;
 
 import java.io.IOException;
 
-/**
- * Created by kbyte on 16/02/2016.
- */
 public class CheckUpdateAsyncTask extends ServiceAsyncTask {
     private final String url;
     private final String version;
@@ -23,17 +22,48 @@ public class CheckUpdateAsyncTask extends ServiceAsyncTask {
         this.version = version;
     }
 
-    @Override
-    protected RequestResult doInBackground(Void... params) {
+    protected JSONObject fetchData(String url) throws IOException, JSONException {
         OkHttpClient client = new OkHttpClient();
         Request request = new Request.Builder()
                 .url(url)
                 .build();
+
+        Response response = client.newCall(request).execute();
+        return new JSONObject(response.body().string());
+    }
+
+    @Override
+    protected RequestResult doInBackground(Void... params) {
+
         try {
-            Response response = client.newCall(request).execute();
-            String text = response.body().string();
-            return new RequestResult(RequestStatus.SUCCESS, text);
+            JSONObject apk_data = fetchData(url);
+
+            RequestResult result;
+
+            if(apk_data.getString("version").equals(version)) {
+                result = new RequestResult(RequestStatus.SAME_VERSION);
+            } else {
+                result = new RequestResult(RequestStatus.DIFFERENT_VERSION);
+            }
+
+            result.setVersion(apk_data.getString("version"));
+            result.setAppName(apk_data.getString("name"));
+
+            String app_url = apk_data.getString("url");
+            if(!(app_url.startsWith("http://") || app_url.startsWith("https://"))) {
+                app_url = url.substring(0, url.lastIndexOf('/')+1) + app_url;
+            }
+
+            // Validate the url
+            if(HttpUrl.parse(app_url) == null)
+                return new RequestResult(RequestStatus.ERROR_INVALID_URL);
+
+            result.setUrl(app_url);
+            return result;
+
         } catch (IOException e) {
+            return new RequestResult(RequestStatus.ERROR, e.getMessage());
+        } catch (JSONException e) {
             return new RequestResult(RequestStatus.ERROR, e.getMessage());
         }
     }

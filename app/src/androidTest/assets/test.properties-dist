@@ -1,2 +1,3 @@
-testurl=http://www.google.it/test
+testurl=http://urlwhereyouputyourtestapkanddescriptor
 testversion=2
+testversionfail=1

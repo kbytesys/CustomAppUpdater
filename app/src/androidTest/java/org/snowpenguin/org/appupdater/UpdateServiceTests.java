@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.IBinder;
 import android.support.test.InstrumentationRegistry;
 import junit.framework.Assert;
+import okhttp3.HttpUrl;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import android.support.test.rule.ServiceTestRule;
@@ -13,6 +14,7 @@ import org.snowpenguin.org.appupdater.service.RequestStatus;
 import org.snowpenguin.org.appupdater.service.UpdateService;
 import org.snowpenguin.org.appupdater.service.task.CheckUpdateAsyncTask;
 import org.snowpenguin.org.appupdater.service.task.ServiceAsyncTask;
+import org.snowpenguin.org.appupdater.task.DummyCheckUpdateTask;
 import org.snowpenguin.org.appupdater.task.DummyTaskObserver;
 
 import java.io.IOException;
@@ -82,7 +84,63 @@ public class UpdateServiceTests {
         CheckUpdateAsyncTask task = new CheckUpdateAsyncTask(dummy, systemProperties.getProperty("testurl"), systemProperties.getProperty("testversion"));
         task.execute().get();
         Assert.assertFalse(dummy.isCancelled());
-        Assert.assertTrue(dummy.getResult() != null && dummy.getResult().getStatus().equals(RequestStatus.SUCCESS));
+        Assert.assertTrue(dummy.getResult() != null);
+        Assert.assertTrue(dummy.getResult().getStatus().equals(RequestStatus.SAME_VERSION));
+        Assert.assertNotNull(HttpUrl.parse(dummy.getResult().getUrl()));
 
+        task = new CheckUpdateAsyncTask(dummy, systemProperties.getProperty("testurl"), systemProperties.getProperty("testversionfail"));
+        task.execute().get();
+        Assert.assertFalse(dummy.isCancelled());
+        Assert.assertTrue(dummy.getResult() != null);
+        Assert.assertTrue(dummy.getResult().getStatus().equals(RequestStatus.DIFFERENT_VERSION));
+        Assert.assertNotNull(HttpUrl.parse(dummy.getResult().getUrl()));
+
+        task = new CheckUpdateAsyncTask(dummy, "invalidurl", systemProperties.getProperty("testversionfail"));
+        task.execute().get();
+        Assert.assertFalse(dummy.isCancelled());
+        Assert.assertTrue(dummy.getResult() != null);
+        Assert.assertTrue(dummy.getResult().getStatus().equals(RequestStatus.ERROR));
+    }
+
+    @Test
+    public void textDummyCheckUpdateTask() throws ExecutionException, InterruptedException {
+        DummyTaskObserver dummy = new DummyTaskObserver();
+        DummyCheckUpdateTask task = new DummyCheckUpdateTask(dummy, systemProperties.getProperty("testurl"), systemProperties.getProperty("testversion"));
+
+        task.setIoError(true);
+        task.execute().get();
+        Assert.assertTrue(dummy.getResult() != null);
+        Assert.assertTrue(dummy.getResult().getStatus().equals(RequestStatus.ERROR));
+
+
+        task = new DummyCheckUpdateTask(dummy, systemProperties.getProperty("testurl"), systemProperties.getProperty("testversion"));
+        task.setJsonData("Some Invalid Data");
+        task.execute().get();
+        Assert.assertTrue(dummy.getResult() != null);
+        Assert.assertTrue(dummy.getResult().getStatus().equals(RequestStatus.ERROR));
+
+        // Check incomplete data
+        task = new DummyCheckUpdateTask(dummy, systemProperties.getProperty("testurl"), systemProperties.getProperty("testversion"));
+        task.setJsonData("{}");
+        task.execute().get();
+        Assert.assertTrue(dummy.getResult() != null);
+        Assert.assertTrue(dummy.getResult().getStatus().equals(RequestStatus.ERROR));
+
+
+        task = new DummyCheckUpdateTask(dummy, systemProperties.getProperty("testurl"), systemProperties.getProperty("testversion"));
+        task.setJsonData("{\"version\": \"2\", \"name\": \"testapp\", \"url\": \"relative_url.apk\"}");
+        task.execute().get();
+        Assert.assertTrue(dummy.getResult() != null);
+        Assert.assertTrue(dummy.getResult().getStatus().equals(RequestStatus.SAME_VERSION));
+        Assert.assertNotNull(HttpUrl.parse(dummy.getResult().getUrl()));
+        Assert.assertEquals(dummy.getResult().getUrl(), systemProperties.getProperty("testurlbase") + "relative_url.apk");
+
+        task = new DummyCheckUpdateTask(dummy, systemProperties.getProperty("testurl"), systemProperties.getProperty("testversion"));
+        task.setJsonData("{\"version\": \"2\", \"name\": \"testapp\", \"url\": \"http://fakedomain/absolute_url.apk\"}");
+        task.execute().get();
+        Assert.assertTrue(dummy.getResult() != null);
+        Assert.assertTrue(dummy.getResult().getStatus().equals(RequestStatus.SAME_VERSION));
+        Assert.assertNotNull(HttpUrl.parse(dummy.getResult().getUrl()));
+        Assert.assertEquals(dummy.getResult().getUrl(), "http://fakedomain/absolute_url.apk");
     }
 }
