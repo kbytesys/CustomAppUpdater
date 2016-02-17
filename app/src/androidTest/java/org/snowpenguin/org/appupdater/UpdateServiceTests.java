@@ -88,6 +88,7 @@ public class UpdateServiceTests {
         Assert.assertTrue(dummy.getResult().getStatus().equals(RequestStatus.SAME_VERSION));
         Assert.assertNotNull(HttpUrl.parse(dummy.getResult().getUrl()));
 
+        dummy = new DummyTaskObserver();
         task = new CheckUpdateAsyncTask(dummy, systemProperties.getProperty("testurl"), systemProperties.getProperty("testversionfail"));
         task.execute().get();
         Assert.assertFalse(dummy.isCancelled());
@@ -95,11 +96,12 @@ public class UpdateServiceTests {
         Assert.assertTrue(dummy.getResult().getStatus().equals(RequestStatus.DIFFERENT_VERSION));
         Assert.assertNotNull(HttpUrl.parse(dummy.getResult().getUrl()));
 
+        dummy = new DummyTaskObserver();
         task = new CheckUpdateAsyncTask(dummy, "invalidurl", systemProperties.getProperty("testversionfail"));
         task.execute().get();
         Assert.assertFalse(dummy.isCancelled());
         Assert.assertTrue(dummy.getResult() != null);
-        Assert.assertTrue(dummy.getResult().getStatus().equals(RequestStatus.ERROR));
+        Assert.assertTrue(dummy.getResult().getStatus().equals(RequestStatus.ERROR_INVALID_URL));
     }
 
     @Test
@@ -113,6 +115,7 @@ public class UpdateServiceTests {
         Assert.assertTrue(dummy.getResult().getStatus().equals(RequestStatus.ERROR));
 
 
+        dummy = new DummyTaskObserver();
         task = new DummyCheckUpdateTask(dummy, systemProperties.getProperty("testurl"), systemProperties.getProperty("testversion"));
         task.setJsonData("Some Invalid Data");
         task.execute().get();
@@ -120,6 +123,7 @@ public class UpdateServiceTests {
         Assert.assertTrue(dummy.getResult().getStatus().equals(RequestStatus.ERROR));
 
         // Check incomplete data
+        dummy = new DummyTaskObserver();
         task = new DummyCheckUpdateTask(dummy, systemProperties.getProperty("testurl"), systemProperties.getProperty("testversion"));
         task.setJsonData("{}");
         task.execute().get();
@@ -127,6 +131,7 @@ public class UpdateServiceTests {
         Assert.assertTrue(dummy.getResult().getStatus().equals(RequestStatus.ERROR));
 
 
+        dummy = new DummyTaskObserver();
         task = new DummyCheckUpdateTask(dummy, systemProperties.getProperty("testurl"), systemProperties.getProperty("testversion"));
         task.setJsonData("{\"version\": \"2\", \"name\": \"testapp\", \"url\": \"relative_url.apk\"}");
         task.execute().get();
@@ -135,6 +140,7 @@ public class UpdateServiceTests {
         Assert.assertNotNull(HttpUrl.parse(dummy.getResult().getUrl()));
         Assert.assertEquals(dummy.getResult().getUrl(), systemProperties.getProperty("testurlbase") + "relative_url.apk");
 
+        dummy = new DummyTaskObserver();
         task = new DummyCheckUpdateTask(dummy, systemProperties.getProperty("testurl"), systemProperties.getProperty("testversion"));
         task.setJsonData("{\"version\": \"2\", \"name\": \"testapp\", \"url\": \"http://fakedomain/absolute_url.apk\"}");
         task.execute().get();

@@ -16,7 +16,7 @@ public class DummyCheckUpdateTask extends CheckUpdateAsyncTask {
     }
 
     @Override
-    protected JSONObject fetchData(String url) throws IOException, JSONException {
+    protected JSONObject fetchData(String url) throws IOException, JSONException, IllegalArgumentException {
         if(ioerror)
             throw new IOException("Fake IO Error");
 

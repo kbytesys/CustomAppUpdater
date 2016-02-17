@@ -22,7 +22,7 @@ public class CheckUpdateAsyncTask extends ServiceAsyncTask {
         this.version = version;
     }
 
-    protected JSONObject fetchData(String url) throws IOException, JSONException {
+    protected JSONObject fetchData(String url) throws IOException, JSONException, IllegalArgumentException {
         OkHttpClient client = new OkHttpClient();
         Request request = new Request.Builder()
                 .url(url)
@@ -65,6 +65,8 @@ public class CheckUpdateAsyncTask extends ServiceAsyncTask {
             return new RequestResult(RequestStatus.ERROR, e.getMessage());
         } catch (JSONException e) {
             return new RequestResult(RequestStatus.ERROR, e.getMessage());
+        } catch (IllegalArgumentException e) {
+            return new RequestResult(RequestStatus.ERROR_INVALID_URL);
         }
     }
 }
