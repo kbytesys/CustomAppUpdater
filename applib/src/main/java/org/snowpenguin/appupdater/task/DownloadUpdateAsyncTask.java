@@ -74,7 +74,7 @@ public class DownloadUpdateAsyncTask extends CauAsyncTask {
                     }
                     else {
                         downloadResult = new RequestResult(RequestStatus.DOWNLOAD_ERROR);
-                        downloadResult.setMessage(c.getString(c.getColumnIndex(DownloadManager.COLUMN_REASON)));
+                        downloadResult.setMessage(String.valueOf(c.getInt(c.getColumnIndex(DownloadManager.COLUMN_REASON))));
                     }
                 }
                 else {
