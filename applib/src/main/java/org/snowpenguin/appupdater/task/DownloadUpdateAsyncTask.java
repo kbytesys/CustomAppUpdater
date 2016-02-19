@@ -8,6 +8,7 @@ import android.content.IntentFilter;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Environment;
+import org.snowpenguin.appupdater.R;
 
 import java.io.File;
 import java.util.concurrent.locks.Condition;
@@ -78,7 +79,7 @@ public class DownloadUpdateAsyncTask extends CauAsyncTask {
                     }
                 }
                 else {
-                    downloadResult = new RequestResult(RequestStatus.ERROR, "Download not found");
+                    downloadResult = new RequestResult(RequestStatus.ERROR, context.getResources().getString(R.string.download_not_found));
                 }
 
                 lock.lock();
