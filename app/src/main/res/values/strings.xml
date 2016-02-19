@@ -3,4 +3,6 @@
     <string name="hello_world">Hello world!</string>
     <string name="title_activity_check_update">CheckUpdateActivity</string>
     <string name="action_settings">Settings</string>
+    <string name="welcome_text"><![CDATA[This app let you to update your custom app without the play store.<br /><br />
+You can\'t use the app directly, please refer to the <a href="https://github.com/kbytesys/CustomAppUpdater">documentation</a> page.]]></string>
 </resources>

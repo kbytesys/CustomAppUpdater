@@ -17,6 +17,7 @@ public class UpdaterIntegrator {
         Intent intent = new Intent(INTENT_ACTION);
         intent.putExtra("url", url);
         intent.putExtra("version", version);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 
         if(intent.resolveActivity(context.getPackageManager()) != null)
         {
