@@ -9,8 +9,8 @@ public class DummyCheckUpdateTask extends CheckUpdateAsyncTask {
     private boolean ioerror;
     private String jsondata;
 
-    public DummyCheckUpdateTask(IRequestObserver observer, String url, String version) {
-        super(observer, url, version);
+    public DummyCheckUpdateTask(IRequestObserver observer, String url, String version, boolean notifyOnPostExecute) {
+        super(observer, url, version, notifyOnPostExecute);
     }
 
     @Override

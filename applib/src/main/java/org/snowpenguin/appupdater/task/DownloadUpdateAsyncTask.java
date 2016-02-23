@@ -27,8 +27,8 @@ public class DownloadUpdateAsyncTask extends CauAsyncTask {
     final Lock lock = new ReentrantLock();
     private Condition waitCondition = lock.newCondition();
 
-    public DownloadUpdateAsyncTask(Context context, IRequestObserver observer, String url, String targetDir, boolean autoExecute, boolean cleanOldApks) {
-        super(observer);
+    public DownloadUpdateAsyncTask(Context context, IRequestObserver observer, String url, String targetDir, boolean autoExecute, boolean cleanOldApks, boolean notifyOnPostExecute) {
+        super(observer, notifyOnPostExecute);
 
         this.url = url;
         this.targetDir = targetDir;
@@ -94,7 +94,7 @@ public class DownloadUpdateAsyncTask extends CauAsyncTask {
     }
 
     @Override
-    protected RequestResult doInBackground(Void... voids) {
+    protected RequestResult backgroundTask(Void... voids) {
         dm = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
         DownloadManager.Request request;
         try {

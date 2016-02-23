@@ -38,60 +38,37 @@ public class CheckUpdateTests {
         loadCustomProperties();
     }
 
-
-    // TODO ripristinare e spostare questo test
-    /*@Test
-    public void testWithBoundService() throws TimeoutException {
-        // Create the service Intent.
-        Intent serviceIntent =
-                new Intent(InstrumentationRegistry.getTargetContext(),
-                        UpdateService.class);
-
-        // Data can be passed to the service via the Intent.
-        //serviceIntent.putExtra(UpdateService.SEED_KEY, 42L);
-
-        serviceIntent.setAction(UpdateService.ACTION_CHECK_NEW_RELEASE);
-        serviceIntent.putExtra(UpdateService.EXTRA_URL, "http://www.google.it");
-        serviceIntent.putExtra(UpdateService.EXTRA_VERSION, "2");
-
-        // Bind the service and grab a reference to the binder.
-        IBinder binder = mServiceRule.bindService(serviceIntent);
-
-        // Get the reference to the service, or you can call
-        // public methods on the binder directly.
-        UpdateService service =
-                ((UpdateService.LocalBinder) binder).getService();
-
-        // Start the service with parameters
-        // service.startService(serviceIntent);
-
-        service.handleCheckNewRelease(systemProperties.getProperty("testurl"), systemProperties.getProperty("testversion"));
-
-    }
-    */
-
     @Test
     public void testCheckUpdateTask() throws ExecutionException, InterruptedException {
         DummyTaskObserver dummy = new DummyTaskObserver();
-        CheckUpdateAsyncTask task = new CheckUpdateAsyncTask(dummy, systemProperties.getProperty("testurl"), systemProperties.getProperty("testversion"));
-        task.execute().get();
+        CheckUpdateAsyncTask task = new CheckUpdateAsyncTask(dummy, systemProperties.getProperty("testurl"), systemProperties.getProperty("testversion"), false);
+        RequestResult result = task.execute().get();
+        Assert.assertFalse(dummy.isCancelled());
+        Assert.assertSame(result, dummy.getResult());
         Assert.assertFalse(dummy.isCancelled());
         Assert.assertTrue(dummy.getResult() != null);
+        Assert.assertTrue(dummy.getStartNotified());
         Assert.assertTrue(dummy.getResult().getStatus().toString(), dummy.getResult().getStatus().equals(RequestStatus.SAME_VERSION));
         Assert.assertNotNull(HttpUrl.parse(dummy.getResult().getUrl()));
 
         dummy = new DummyTaskObserver();
-        task = new CheckUpdateAsyncTask(dummy, systemProperties.getProperty("testurl"), systemProperties.getProperty("testversionfail"));
-        task.execute().get();
+        task = new CheckUpdateAsyncTask(dummy, systemProperties.getProperty("testurl"), systemProperties.getProperty("testversionfail"), false);
+        result = task.execute().get();
         Assert.assertFalse(dummy.isCancelled());
+        Assert.assertSame(result, dummy.getResult());
+        Assert.assertFalse(dummy.isCancelled());
+        Assert.assertTrue(dummy.getStartNotified());
         Assert.assertTrue(dummy.getResult() != null);
         Assert.assertTrue(dummy.getResult().getStatus().toString(), dummy.getResult().getStatus().equals(RequestStatus.DIFFERENT_VERSION));
         Assert.assertNotNull(HttpUrl.parse(dummy.getResult().getUrl()));
 
         dummy = new DummyTaskObserver();
-        task = new CheckUpdateAsyncTask(dummy, "invalidurl", systemProperties.getProperty("testversionfail"));
-        task.execute().get();
+        task = new CheckUpdateAsyncTask(dummy, "invalidurl", systemProperties.getProperty("testversionfail"), false);
+        result = task.execute().get();
         Assert.assertFalse(dummy.isCancelled());
+        Assert.assertSame(result, dummy.getResult());
+        Assert.assertFalse(dummy.isCancelled());
+        Assert.assertTrue(dummy.getStartNotified());
         Assert.assertTrue(dummy.getResult() != null);
         Assert.assertTrue(dummy.getResult().getStatus().equals(RequestStatus.ERROR_INVALID_URL));
     }
@@ -99,43 +76,58 @@ public class CheckUpdateTests {
     @Test
     public void textDummyCheckUpdateTask() throws ExecutionException, InterruptedException {
         DummyTaskObserver dummy = new DummyTaskObserver();
-        DummyCheckUpdateTask task = new DummyCheckUpdateTask(dummy, systemProperties.getProperty("testurl"), systemProperties.getProperty("testversion"));
+        DummyCheckUpdateTask task = new DummyCheckUpdateTask(dummy, systemProperties.getProperty("testurl"), systemProperties.getProperty("testversion"), false);
 
         task.setIoError(true);
-        task.execute().get();
+        RequestResult result = task.execute().get();
+        Assert.assertFalse(dummy.isCancelled());
+        Assert.assertSame(result, dummy.getResult());
+        Assert.assertTrue(dummy.getStartNotified());
         Assert.assertTrue(dummy.getResult() != null);
         Assert.assertTrue(dummy.getResult().getStatus().equals(RequestStatus.ERROR));
 
 
         dummy = new DummyTaskObserver();
-        task = new DummyCheckUpdateTask(dummy, systemProperties.getProperty("testurl"), systemProperties.getProperty("testversion"));
+        task = new DummyCheckUpdateTask(dummy, systemProperties.getProperty("testurl"), systemProperties.getProperty("testversion"), false);
         task.setJsonData("Some Invalid Data");
-        task.execute().get();
+        result = task.execute().get();
+        Assert.assertFalse(dummy.isCancelled());
+        Assert.assertSame(result, dummy.getResult());
+        Assert.assertTrue(dummy.getStartNotified());
         Assert.assertTrue(dummy.getResult() != null);
         Assert.assertTrue(dummy.getResult().getStatus().equals(RequestStatus.ERROR));
 
         // Check incomplete data
         dummy = new DummyTaskObserver();
-        task = new DummyCheckUpdateTask(dummy, systemProperties.getProperty("testurl"), systemProperties.getProperty("testversion"));
+        task = new DummyCheckUpdateTask(dummy, systemProperties.getProperty("testurl"), systemProperties.getProperty("testversion"), false);
         task.setJsonData("{}");
-        task.execute().get();
+        result = task.execute().get();
+        Assert.assertFalse(dummy.isCancelled());
+        Assert.assertSame(result, dummy.getResult());
+        Assert.assertTrue(dummy.getStartNotified());
         Assert.assertTrue(dummy.getResult() != null);
         Assert.assertTrue(dummy.getResult().getStatus().equals(RequestStatus.ERROR));
 
 
         dummy = new DummyTaskObserver();
-        task = new DummyCheckUpdateTask(dummy, systemProperties.getProperty("testurl"), systemProperties.getProperty("testversion"));
+        task = new DummyCheckUpdateTask(dummy, systemProperties.getProperty("testurl"), systemProperties.getProperty("testversion"), false);
         task.setJsonData("{\"version\": \"2\", \"name\": \"testapp\", \"url\": \"relative_url.apk\"}");
-        task.execute().get();
+        result = task.execute().get();
+        Assert.assertFalse(dummy.isCancelled());
+        Assert.assertSame(result, dummy.getResult());
+        Assert.assertTrue(dummy.getStartNotified());
         Assert.assertTrue(dummy.getResult() != null);
         Assert.assertTrue(dummy.getResult().getStatus().equals(RequestStatus.SAME_VERSION));
         Assert.assertNotNull(HttpUrl.parse(dummy.getResult().getUrl()));
         Assert.assertEquals(dummy.getResult().getUrl(), systemProperties.getProperty("testurlbase") + "relative_url.apk");
 
         dummy = new DummyTaskObserver();
-        task = new DummyCheckUpdateTask(dummy, systemProperties.getProperty("testurl"), systemProperties.getProperty("testversion"));
+        task = new DummyCheckUpdateTask(dummy, systemProperties.getProperty("testurl"), systemProperties.getProperty("testversion"), false);
         task.setJsonData("{\"version\": \"2\", \"name\": \"testapp\", \"url\": \"http://fakedomain/absolute_url.apk\"}");
-        task.execute().get();
+        result = task.execute().get();
+        Assert.assertFalse(dummy.isCancelled());
+        Assert.assertSame(result, dummy.getResult());
+        Assert.assertTrue(dummy.getStartNotified());
         Assert.assertTrue(dummy.getResult() != null);
         Assert.assertTrue(dummy.getResult().getStatus().equals(RequestStatus.SAME_VERSION));
         Assert.assertNotNull(HttpUrl.parse(dummy.getResult().getUrl()));

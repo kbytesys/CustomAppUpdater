@@ -13,8 +13,8 @@ public class CheckUpdateAsyncTask extends CauAsyncTask {
     private final String url;
     private final String version;
 
-    public CheckUpdateAsyncTask(IRequestObserver observer, String url, String version) {
-        super(observer);
+    public CheckUpdateAsyncTask(IRequestObserver observer, String url, String version, boolean notifyOnPostExecute) {
+        super(observer, notifyOnPostExecute);
         this.url = url;
         this.version = version;
     }
@@ -30,7 +30,7 @@ public class CheckUpdateAsyncTask extends CauAsyncTask {
     }
 
     @Override
-    protected RequestResult doInBackground(Void... params) {
+    protected RequestResult backgroundTask(Void... params) {
 
         try {
             JSONObject apk_data = fetchData(url);

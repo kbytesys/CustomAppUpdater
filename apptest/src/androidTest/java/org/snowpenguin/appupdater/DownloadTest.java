@@ -5,6 +5,7 @@ import junit.framework.Assert;
 import org.junit.Test;
 import org.snowpenguin.appupdater.task.DownloadUpdateAsyncTask;
 import org.snowpenguin.appupdater.task.DummyTaskObserver;
+import org.snowpenguin.appupdater.task.RequestResult;
 import org.snowpenguin.appupdater.task.RequestStatus;
 
 import java.io.IOException;
@@ -30,42 +31,57 @@ public class DownloadTest extends AndroidTestCase {
         }
     }
 
-    @Test
     public void testDownloadInstallTask() throws ExecutionException, InterruptedException {
         DummyTaskObserver dummy = new DummyTaskObserver();
         DownloadUpdateAsyncTask task = new DownloadUpdateAsyncTask(getContext(),
-                dummy, systemProperties.getProperty("testappurl"), "cautest", true, true);
+                dummy, systemProperties.getProperty("testappurl"), "cautest", true, true, false);
         task.execute().get();
         Assert.assertTrue(true);
     }
 
-    @Test
     public void testDownloadTask() throws ExecutionException, InterruptedException {
         DummyTaskObserver dummy = new DummyTaskObserver();
         DownloadUpdateAsyncTask task = new DownloadUpdateAsyncTask(getContext(),
-                dummy, systemProperties.getProperty("testappurl"), "cautest", true, false);
-        task.execute().get();
+                dummy, systemProperties.getProperty("testappurl"), "cautest", true, false, false);
+        RequestResult result = task.execute().get();
+        Assert.assertFalse(dummy.isCancelled());
+        assertSame(result, dummy.getResult());
         assertTrue(dummy.getResult() != null);
         assertEquals(dummy.getResult().getStatus(), RequestStatus.SUCCESS);
         assertNotNull(dummy.getResult().getAppUri());
     }
 
-    @Test
+    public void testDownloadTaskPostExecute() throws ExecutionException, InterruptedException {
+        DummyTaskObserver dummy = new DummyTaskObserver();
+        DownloadUpdateAsyncTask task = new DownloadUpdateAsyncTask(getContext(),
+                dummy, systemProperties.getProperty("testappurl"), "cautest", true, false, true);
+        RequestResult result = task.execute().get();
+        Thread.sleep(500);
+        Assert.assertFalse(dummy.isCancelled());
+        assertSame(result, dummy.getResult());
+        assertTrue(dummy.getResult() != null);
+        assertEquals(dummy.getResult().getStatus(), RequestStatus.SUCCESS);
+        assertNotNull(dummy.getResult().getAppUri());
+    }
+
     public void testDownloadTaskInvalid() throws ExecutionException, InterruptedException {
         DummyTaskObserver dummy = new DummyTaskObserver();
         DownloadUpdateAsyncTask task = new DownloadUpdateAsyncTask(getContext(),
-                dummy, "invalidurl", "cautest", true, false);
-        task.execute().get();
+                dummy, "invalidurl", "cautest", true, false, false);
+        RequestResult result = task.execute().get();
+        Assert.assertFalse(dummy.isCancelled());
+        assertSame(result, dummy.getResult());
         assertTrue(dummy.getResult() != null);
         assertEquals(dummy.getResult().getStatus(), RequestStatus.ERROR_INVALID_URL);
     }
 
-    @Test
     public void testDownloadTask404() throws ExecutionException, InterruptedException {
         DummyTaskObserver dummy = new DummyTaskObserver();
         DownloadUpdateAsyncTask task = new DownloadUpdateAsyncTask(getContext(),
-                dummy, systemProperties.getProperty("testappurl").replace(".apk", ".fake"), "cautest", true, false);
-        task.execute().get();
+                dummy, systemProperties.getProperty("testappurl").replace(".apk", ".fake"), "cautest", true, false, false);
+        RequestResult result = task.execute().get();
+        Assert.assertFalse(dummy.isCancelled());
+        assertSame(result, dummy.getResult());
         assertTrue(dummy.getResult() != null);
         assertEquals(dummy.getResult().getStatus(), RequestStatus.DOWNLOAD_ERROR);
         assertEquals(dummy.getResult().getMessage(), "404");

@@ -4,6 +4,12 @@ public class DummyTaskObserver implements IRequestObserver {
 
     private RequestResult result = null;
     private boolean cancelled = false;
+    private boolean startRecevied = false;
+
+    @Override
+    public void notifyStarted() {
+        startRecevied = true;
+    }
 
     @Override
     public void notifyResult(RequestResult requestResult) {
@@ -35,5 +41,9 @@ public class DummyTaskObserver implements IRequestObserver {
     public RequestResult getResult()
     {
         return result;
+    }
+
+    public boolean getStartNotified() {
+        return startRecevied;
     }
 }
