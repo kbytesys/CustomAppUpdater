@@ -3,4 +3,14 @@
     <string name="welcome_text"><![CDATA[Questa app ti permette di aggiornare la tua applicazione senza dover utilizzare il Play Store.<br /><br />
 Tuttavia non puoi usarla direttamente, vai alla <a href="https://github.com/kbytesys/CustomAppUpdater">documentazione</a> per maggiorni informazioni.]]></string>
     <string name="title_activity_check_update">Controllo Aggiornamenti</string>
+    <string name="update_button_text">Aggiorna</string>
+    <string name="update_no_intent">Impossibile cercare gli aggiornamenti</string>
+    <string name="update_no_intent_bis">Dati forniti non validi, controlla la versione della libreria utilizzata o i parametri passati a questa attività.</string>
+    <string name="update_check_inprogress">Controllo aggiornamenti…</string>
+    <string name="update_cencelled">Operazione cancellata dall\'utente</string>
+    <string name="update_same_version">Stai già utilizzando l\'ultima versione disponibile.</string>
+    <string name="update_check_error">Errore durante la ricerca di nuovi aggiornamenti.</string>
+    <string name="update_new_version"><![CDATA[<b>Nuova versione di "%1$s" disponibile</b>\n
+<b>Vecchia versione:</b> %2$s\n
+<b>Nuova versione:</b> %3$s]]></string>
 </resources>

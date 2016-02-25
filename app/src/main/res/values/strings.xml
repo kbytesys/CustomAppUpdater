@@ -5,4 +5,14 @@
     <string name="action_settings">Settings</string>
     <string name="welcome_text"><![CDATA[This app let you to update your custom app without the play store.<br /><br />
 You can\'t use the app directly, please refer to the <a href="https://github.com/kbytesys/CustomAppUpdater">documentation</a> page.]]></string>
+    <string name="update_button_text">Update</string>
+    <string name="update_no_intent">I can\'t check for updates</string>
+    <string name="update_no_intent_bis">No valid data provided, check the integration library version or the intent extra parameters.</string>
+    <string name="update_check_inprogress">Checking for updates...</string>
+    <string name="update_cencelled">Operation cancelled by the user</string>
+    <string name="update_same_version">You\'re already using the latest version.</string>
+    <string name="update_check_error">Error while searching for new updates.</string>
+    <string name="update_new_version"><![CDATA[<b>New release for "%1$s" available</b>\n
+<b>Old release:</b> %2$s\n
+<b>New release:</b> %3$s]]></string>
 </resources>
