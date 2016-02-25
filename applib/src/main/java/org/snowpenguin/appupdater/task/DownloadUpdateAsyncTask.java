@@ -8,7 +8,6 @@ import android.content.IntentFilter;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Environment;
-import org.snowpenguin.appupdater.R;
 
 import java.io.File;
 import java.util.concurrent.locks.Condition;

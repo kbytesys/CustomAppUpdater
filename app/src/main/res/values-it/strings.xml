@@ -2,4 +2,5 @@
 <resources>
     <string name="welcome_text"><![CDATA[Questa app ti permette di aggiornare la tua applicazione senza dover utilizzare il Play Store.<br /><br />
 Tuttavia non puoi usarla direttamente, vai alla <a href="https://github.com/kbytesys/CustomAppUpdater">documentazione</a> per maggiorni informazioni.]]></string>
+    <string name="title_activity_check_update">Controllo Aggiornamenti</string>
 </resources>
