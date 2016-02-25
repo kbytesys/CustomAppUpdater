@@ -1,0 +1,5 @@
+testurl=http://urlwhereyouputyourtestapkanddescriptor/test.json
+testurlbase=http://urlwhereyouputyourtestapkanddescriptor/
+testappurl=http://urlwhereyouputyourtestapkanddescriptor/testapp.apk
+testversion=2
+testversionfail=1

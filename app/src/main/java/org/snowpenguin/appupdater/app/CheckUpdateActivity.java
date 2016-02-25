@@ -3,6 +3,9 @@ package org.snowpenguin.appupdater.app;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Html;
+import android.text.Spannable;
+import android.text.Spanned;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -22,6 +25,7 @@ public class CheckUpdateActivity extends AppCompatActivity {
     private Animation rotationAnimation;
     private TextView titleLabel;
     private Button updateButton;
+    private Button retryButton;
     private TextView resultTextView;
     private RequestResult lastResult;
 
@@ -39,6 +43,7 @@ public class CheckUpdateActivity extends AppCompatActivity {
         public void notifyStarted() {
             updateTitleLabel(R.string.update_check_inprogress);
             resultTextView.setText("");
+            retryButton.setVisibility(View.GONE);
             showWaitingImage();
         }
 
@@ -50,8 +55,7 @@ public class CheckUpdateActivity extends AppCompatActivity {
                 case DIFFERENT_VERSION:
                     showOkImage();
                     updateButton.setVisibility(View.VISIBLE);
-                    resultTextView.setText(String.format(
-                            getResultTemplate(R.string.update_new_version),
+                    resultTextView.setText(getResultTemplate(R.string.update_new_version,
                                 lastResult.getAppName(),
                                 version,
                                 lastResult.getVersion()
@@ -61,9 +65,16 @@ public class CheckUpdateActivity extends AppCompatActivity {
                     showOkImage();
                     resultTextView.setText(getResultTemplate(R.string.update_same_version));
                     break;
+                case ERROR_INVALID_URL:
+                    showFailImage();
+                    resultTextView.setText(getResultTemplate(R.string.update_check_error));
+                    resultTextView.setText(getResultTemplate(R.string.update_no_intent_bis));
+                    break;
                 default:
                     showFailImage();
                     resultTextView.setText(getResultTemplate(R.string.update_check_error));
+                    resultTextView.setText(getResultTemplate(R.string.update_check_error_bis));
+                    retryButton.setVisibility(View.VISIBLE);
             }
         }
 
@@ -95,21 +106,36 @@ public class CheckUpdateActivity extends AppCompatActivity {
         titleLabel = (TextView)findViewById(R.id.titleLabel);
         updateButton = (Button)findViewById(R.id.updateButton);
         updateButton.setVisibility(View.GONE);
-        Animation rotationAnimation = AnimationUtils.loadAnimation(this, R.anim.wait_anim);
+        retryButton = (Button)findViewById(R.id.retryButton);
+        retryButton.setVisibility(View.GONE);
+        rotationAnimation = AnimationUtils.loadAnimation(this, R.anim.wait_anim);
         rotationAnimation.setDuration(1000);
         resultTextView = (TextView)findViewById(R.id.resultTextView);
 
+        final String version;
+        final String url;
+
         Intent intent = getIntent();
 
-        if(intent == null || !intent.getAction().equals(INTENT_ACTION)) {
+        if(intent == null || !intent.getAction().equals(INTENT_ACTION) ||
+                intent.getExtras().getString("version", null) == null ||
+                intent.getExtras().getString("url", null) == null) {
             updateTitleLabel(R.string.update_no_intent);
             resultTextView.setText(getResultTemplate(R.string.update_no_intent_bis));
             showFailImage();
             return;
         }
 
-        String version = intent.getExtras().getString("version", "");
-        String url = intent.getExtras().getString("url", "");
+        version = intent.getExtras().getString("version");
+        url = intent.getExtras().getString("url");
+
+        retryButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                CheckUpdateAsyncTask task = new CheckUpdateAsyncTask(new CheckUpdateNotifier(version), url, version, true);
+                task.execute();
+            }
+        });
 
         CheckUpdateAsyncTask task = new CheckUpdateAsyncTask(new CheckUpdateNotifier(version), url, version, true);
         task.execute();
@@ -134,10 +160,13 @@ public class CheckUpdateActivity extends AppCompatActivity {
         titleLabel.setText(resId);
     }
 
-    private String getResultTemplate(int resId) {
-        return this.getResources().getString(resId);
+    private Spanned getResultTemplate(int resId) {
+        return Html.fromHtml(this.getResources().getString(resId));
     }
 
+    private Spanned getResultTemplate(int resId, Object... formatArgs) {
+        return Html.fromHtml(String.format(this.getResources().getString(resId), formatArgs));
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -154,5 +183,13 @@ public class CheckUpdateActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         return super.onOptionsItemSelected(item);
+    }
+
+    /**
+     * Function for test propose only
+     * @return
+     */
+    RequestResult getLastResult() {
+        return lastResult;
     }
 }

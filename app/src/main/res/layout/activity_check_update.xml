@@ -29,6 +29,12 @@
             android:text="@string/update_button_text"
             android:layout_below="@+id/resultTextView" android:layout_centerHorizontal="true"
             android:layout_marginTop="30dp" android:id="@+id/updateButton"/>
+    <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/retryButtonLabel"
+            android:layout_marginTop="30dp"
+            android:id="@+id/retryButton" android:layout_below="@+id/updateButton" android:layout_centerHorizontal="true"/>
 
 
 </RelativeLayout>

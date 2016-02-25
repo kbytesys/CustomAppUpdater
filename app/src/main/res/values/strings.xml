@@ -12,7 +12,11 @@ You can\'t use the app directly, please refer to the <a href="https://github.com
     <string name="update_cencelled">Operation cancelled by the user</string>
     <string name="update_same_version">You\'re already using the latest version.</string>
     <string name="update_check_error">Error while searching for new updates.</string>
-    <string name="update_new_version"><![CDATA[<b>New release for "%1$s" available</b>\n
-<b>Old release:</b> %2$s\n
+    <string name="update_new_version"><![CDATA[<b>New release for "%1$s" available</b><br><br>
+<b>Old release:</b> %2$s<br>
 <b>New release:</b> %3$s]]></string>
+    <string name="update_check_error_bis">Check your Internet connection and retry. If the problem persist contact the
+        custom application distributor.
+    </string>
+    <string name="retryButtonLabel">Retry</string>
 </resources>

@@ -10,7 +10,11 @@ Tuttavia non puoi usarla direttamente, vai alla <a href="https://github.com/kbyt
     <string name="update_cencelled">Operazione cancellata dall\'utente</string>
     <string name="update_same_version">Stai già utilizzando l\'ultima versione disponibile.</string>
     <string name="update_check_error">Errore durante la ricerca di nuovi aggiornamenti.</string>
-    <string name="update_new_version"><![CDATA[<b>Nuova versione di "%1$s" disponibile</b>\n
-<b>Vecchia versione:</b> %2$s\n
+    <string name="update_new_version"><![CDATA[<b>Nuova versione di "%1$s" disponibile</b><br><br>
+<b>Vecchia versione:</b> %2$s<br>
 <b>Nuova versione:</b> %3$s]]></string>
+    <string name="update_check_error_bis">Controlla la tua connessione e riprova. Se il problema persiste contatta chi distribuisce l\'applicazione da
+        aggiornare.
+    </string>
+    <string name="retryButtonLabel">Ritenta</string>
 </resources>

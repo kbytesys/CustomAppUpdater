@@ -11,14 +11,6 @@
         tools:ignore="AllowBackup" >
 
         <activity
-            android:name=".MainActivity"
-            android:label="@string/app_name" >
-            <!-- we don't need the launcher <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>-->
-        </activity>
-        <activity
             android:name=".CheckUpdateActivity"
             android:label="@string/title_activity_check_update" >
             <intent-filter>
