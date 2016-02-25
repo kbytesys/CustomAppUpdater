@@ -17,4 +17,7 @@ Tuttavia non puoi usarla direttamente, vai alla <a href="https://github.com/kbyt
         aggiornare.
     </string>
     <string name="retryButtonLabel">Ritenta</string>
+    <string name="update_success">Download terminato. Esecuzione aggiornamento apk in corso.</string>
+    <string name="update_download_inprogress">Download in corso…</string>
+    <string name="update_download_error">Errore download</string>
 </resources>

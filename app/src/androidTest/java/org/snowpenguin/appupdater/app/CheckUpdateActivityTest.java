@@ -1,18 +1,22 @@
 package org.snowpenguin.appupdater.app;
 
 import android.content.Intent;
+import android.support.test.InstrumentationRegistry;
 import android.test.ActivityInstrumentationTestCase2;
 import android.view.View;
 import android.widget.TextView;
+import org.junit.Before;
 import org.snowpenguin.appupdater.task.RequestResult;
 import org.snowpenguin.appupdater.task.RequestStatus;
+
+import static android.support.test.espresso.Espresso.onView;
+import static android.support.test.espresso.action.ViewActions.click;
+import static android.support.test.espresso.matcher.ViewMatchers.withId;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Properties;
-
-import static android.support.test.espresso.Espresso.onView;
 
 public class CheckUpdateActivityTest extends ActivityInstrumentationTestCase2<CheckUpdateActivity> {
 
@@ -41,6 +45,12 @@ public class CheckUpdateActivityTest extends ActivityInstrumentationTestCase2<Ch
             loadCustomProperties();
         } catch (IOException ignored) {
         }
+    }
+
+    @Before
+    public void setUp() throws Exception {
+        super.setUp();
+        injectInstrumentation(InstrumentationRegistry.getInstrumentation());
     }
 
     public void testNoIntent() {
@@ -75,7 +85,7 @@ public class CheckUpdateActivityTest extends ActivityInstrumentationTestCase2<Ch
         } catch (InterruptedException ignored) {
         }
 
-        RequestResult lastResult = activity.getLastResult();
+        RequestResult lastResult = activity.getLastCheckResult();
         assertNotNull(lastResult);
         assertEquals(RequestStatus.ERROR_INVALID_URL, lastResult.getStatus());
     }
@@ -97,7 +107,7 @@ public class CheckUpdateActivityTest extends ActivityInstrumentationTestCase2<Ch
         } catch (InterruptedException ignored) {
         }
 
-        RequestResult lastResult = activity.getLastResult();
+        RequestResult lastResult = activity.getLastCheckResult();
         assertNotNull(lastResult);
         assertEquals(RequestStatus.DIFFERENT_VERSION, lastResult.getStatus());
         assertEquals(View.VISIBLE, activity.findViewById(R.id.updateButton).getVisibility());
@@ -113,10 +123,36 @@ public class CheckUpdateActivityTest extends ActivityInstrumentationTestCase2<Ch
         } catch (InterruptedException ignored) {
         }
 
-        RequestResult lastResult = activity.getLastResult();
+        RequestResult lastResult = activity.getLastCheckResult();
         assertNotNull(lastResult);
         assertEquals(RequestStatus.SAME_VERSION, lastResult.getStatus());
         assertEquals(View.GONE, activity.findViewById(R.id.updateButton).getVisibility());
         assertEquals(View.GONE, activity.findViewById(R.id.retryButton).getVisibility());
+    }
+
+
+
+    public void testDownloadSuccess() {
+        setActivityIntent(createTestIntent(false));
+        CheckUpdateActivity activity = getActivity();
+
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException ignored) {
+        }
+
+        onView(withId(R.id.updateButton)).perform(click());
+
+        try {
+            Thread.sleep(10000);
+        } catch (InterruptedException ignored) {
+        }
+
+        RequestResult lastResult = activity.getLastDownloadResult();
+        assertNotNull(lastResult);
+        assertEquals(RequestStatus.SUCCESS, lastResult.getStatus());
+        assertEquals(View.GONE, activity.findViewById(R.id.updateButton).getVisibility());
+        assertEquals(View.GONE, activity.findViewById(R.id.retryButton).getVisibility());
+
     }
 }

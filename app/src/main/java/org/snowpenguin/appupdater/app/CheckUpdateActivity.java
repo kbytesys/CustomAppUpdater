@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Html;
-import android.text.Spannable;
 import android.text.Spanned;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -14,10 +13,7 @@ import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import org.snowpenguin.appupdater.task.CheckUpdateAsyncTask;
-import org.snowpenguin.appupdater.task.IRequestObserver;
-import org.snowpenguin.appupdater.task.RequestProgress;
-import org.snowpenguin.appupdater.task.RequestResult;
+import org.snowpenguin.appupdater.task.*;
 
 public class CheckUpdateActivity extends AppCompatActivity {
 
@@ -27,9 +23,16 @@ public class CheckUpdateActivity extends AppCompatActivity {
     private Button updateButton;
     private Button retryButton;
     private TextView resultTextView;
-    private RequestResult lastResult;
+    private RequestResult lastCheckResult;
+    private RequestResult lastDownloadResult;
 
     public static final String INTENT_ACTION = "org.snowpenguin.appupdater.CHECK_UPDATE";
+    private CheckUpdateNotifier checkObserver;
+    private DownloadNotifier downloadNotifier = new DownloadNotifier();
+
+    private String version;
+    private String url;
+    private String appUrl;
 
     class CheckUpdateNotifier implements IRequestObserver {
 
@@ -49,16 +52,16 @@ public class CheckUpdateActivity extends AppCompatActivity {
 
         @Override
         public void notifyResult(RequestResult requestResult) {
-            lastResult = requestResult;
+            lastCheckResult = requestResult;
 
-            switch (lastResult.getStatus()) {
+            switch (lastCheckResult.getStatus()) {
                 case DIFFERENT_VERSION:
                     showOkImage();
                     updateButton.setVisibility(View.VISIBLE);
                     resultTextView.setText(getResultTemplate(R.string.update_new_version,
-                                lastResult.getAppName(),
+                                lastCheckResult.getAppName(),
                                 version,
-                                lastResult.getVersion()
+                                lastCheckResult.getVersion()
                     ));
                     break;
                 case SAME_VERSION:
@@ -67,12 +70,12 @@ public class CheckUpdateActivity extends AppCompatActivity {
                     break;
                 case ERROR_INVALID_URL:
                     showFailImage();
-                    resultTextView.setText(getResultTemplate(R.string.update_check_error));
+                    updateTitleLabel(R.string.update_check_error);
                     resultTextView.setText(getResultTemplate(R.string.update_no_intent_bis));
                     break;
                 default:
                     showFailImage();
-                    resultTextView.setText(getResultTemplate(R.string.update_check_error));
+                    updateTitleLabel(R.string.update_check_error);
                     resultTextView.setText(getResultTemplate(R.string.update_check_error_bis));
                     retryButton.setVisibility(View.VISIBLE);
             }
@@ -92,6 +95,53 @@ public class CheckUpdateActivity extends AppCompatActivity {
         public void notifyCancelled() {
             resultTextView.setText(getResultTemplate(R.string.update_cencelled));
             showFailImage();
+            retryButton.setVisibility(View.VISIBLE);
+        }
+    }
+
+    class DownloadNotifier implements IRequestObserver {
+
+        @Override
+        public void notifyStarted() {
+            updateTitleLabel(R.string.update_download_inprogress);
+            resultTextView.setText("");
+            retryButton.setVisibility(View.GONE);
+            updateButton.setVisibility(View.GONE);
+            showWaitingImage();
+        }
+
+        @Override
+        public void notifyResult(RequestResult requestResult) {
+            lastDownloadResult = requestResult;
+
+            switch (lastDownloadResult.getStatus()) {
+                case SUCCESS:
+                    showOkImage();
+                    resultTextView.setText(R.string.update_success);
+                    break;
+                default:
+                    showFailImage();
+                    updateTitleLabel(R.string.update_download_error);
+                    resultTextView.setText(getResultTemplate(R.string.update_check_error_bis));
+                    retryButton.setVisibility(View.VISIBLE);
+            }
+        }
+
+        @Override
+        public void notifyProgress(RequestProgress[] values) {
+
+        }
+
+        @Override
+        public void notifyCancelled(RequestResult requestResult) {
+            notifyCancelled();
+        }
+
+        @Override
+        public void notifyCancelled() {
+            resultTextView.setText(getResultTemplate(R.string.update_cencelled));
+            showFailImage();
+            retryButton.setVisibility(View.VISIBLE);
         }
     }
 
@@ -112,9 +162,6 @@ public class CheckUpdateActivity extends AppCompatActivity {
         rotationAnimation.setDuration(1000);
         resultTextView = (TextView)findViewById(R.id.resultTextView);
 
-        final String version;
-        final String url;
-
         Intent intent = getIntent();
 
         if(intent == null || !intent.getAction().equals(INTENT_ACTION) ||
@@ -129,15 +176,36 @@ public class CheckUpdateActivity extends AppCompatActivity {
         version = intent.getExtras().getString("version");
         url = intent.getExtras().getString("url");
 
+        checkObserver = new CheckUpdateNotifier(version);
+
         retryButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                CheckUpdateAsyncTask task = new CheckUpdateAsyncTask(new CheckUpdateNotifier(version), url, version, true);
-                task.execute();
+                if(appUrl == null)
+                    tryCheckTask();
+                else
+                    tryDownloadTask();
             }
         });
 
-        CheckUpdateAsyncTask task = new CheckUpdateAsyncTask(new CheckUpdateNotifier(version), url, version, true);
+        updateButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                tryDownloadTask();
+            }
+        });
+
+        tryCheckTask();
+    }
+
+    private void tryCheckTask() {
+        CheckUpdateAsyncTask task = new CheckUpdateAsyncTask(checkObserver, url, version, true);
+        task.execute();
+    }
+
+    private void tryDownloadTask() {
+        DownloadUpdateAsyncTask task = new DownloadUpdateAsyncTask(CheckUpdateActivity.this,
+                downloadNotifier, lastCheckResult.getUrl(), "CustomAppUpdater", true, true, true);
         task.execute();
     }
 
@@ -189,7 +257,15 @@ public class CheckUpdateActivity extends AppCompatActivity {
      * Function for test propose only
      * @return
      */
-    RequestResult getLastResult() {
-        return lastResult;
+    RequestResult getLastCheckResult() {
+        return lastCheckResult;
+    }
+
+    /**
+     * Function for test propose only
+     * @return
+     */
+    RequestResult getLastDownloadResult() {
+        return lastDownloadResult;
     }
 }

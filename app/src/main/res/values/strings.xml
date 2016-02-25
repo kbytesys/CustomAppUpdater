@@ -8,7 +8,7 @@ You can\'t use the app directly, please refer to the <a href="https://github.com
     <string name="update_button_text">Update</string>
     <string name="update_no_intent">I can\'t check for updates</string>
     <string name="update_no_intent_bis">No valid data provided, check the integration library version or the intent extra parameters.</string>
-    <string name="update_check_inprogress">Checking for updates...</string>
+    <string name="update_check_inprogress">Checking for updates…</string>
     <string name="update_cencelled">Operation cancelled by the user</string>
     <string name="update_same_version">You\'re already using the latest version.</string>
     <string name="update_check_error">Error while searching for new updates.</string>
@@ -19,4 +19,7 @@ You can\'t use the app directly, please refer to the <a href="https://github.com
         custom application distributor.
     </string>
     <string name="retryButtonLabel">Retry</string>
+    <string name="update_success">Application downloaded, executing apk update.</string>
+    <string name="update_download_inprogress">Download in progress…</string>
+    <string name="update_download_error">Download error</string>
 </resources>
